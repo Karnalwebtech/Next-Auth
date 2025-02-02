@@ -1,44 +1,36 @@
-import { type NextRequest, NextResponse } from "next/server";
-export { default } from "next-auth/middleware";
-import { getToken } from "next-auth/jwt";
+import { type NextRequest, NextResponse } from "next/server"
+import { getToken } from "next-auth/jwt"
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
-  const url = request.nextUrl;
+  const token = await getToken({ req: request })
+  const url = request.nextUrl
+  console.log("token", token)
 
   // If the user is authenticated and trying to access auth pages, redirect to home
   if (
     token &&
-    (url.pathname.startsWith("/sign-in") ||
-      url.pathname.startsWith("/sign-up") ||
-      url.pathname.startsWith("/verify") ||
-      url.pathname.startsWith("/error") ||
-      url.pathname.startsWith("/forgot-password"))
-  ) {
-    return NextResponse.redirect(new URL("/", request.url));
+    (url.pathname === "/sign-in" ||
+      url.pathname === "/sign-up" ||
+      url.pathname === "/verify" ||
+      url.pathname === "/error" ||
+      url.pathname === "/forgot-password")
+    ) {
+    console.log("homess")
+    return NextResponse.redirect(new URL("/", request.url))
   }
 
   // If the user is not authenticated and trying to access protected routes, redirect to sign-in
-  if (
-    !token &&
-    (url.pathname === "/" || url.pathname.startsWith("/protected"))
-  ) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  if (!token && (url.pathname === "/" || url.pathname.startsWith("/protected"))) {
+    console.log("not homess")
+    return NextResponse.redirect(new URL("/sign-in", request.url))
   }
 
   // For all other cases, allow the request to proceed
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: [
-    "/",
-    "/sign-in",
-    "/sign-up",
-    "/forgot-password",
-    "/verify/:path*",
-    "/protected/:path*",
-    "/error/:path*",
-  ],
-};
+  matcher: ["/", "/sign-in", "/sign-up", "/forgot-password", "/verify", "/protected/:path*", "/error"],
+}
+
