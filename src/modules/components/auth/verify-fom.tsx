@@ -30,11 +30,16 @@ export function VerifyForm({
   const [otpValue, setOtpValue] = useState("");
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(59);
-  const token: any = getSessionData("token");
+  const [token, setToken] = useState<string | null>(null);
+  const storedToken = getSessionData("token");
+  //console.log(token)
   useEffect(() => {
-    if (!token) {
+    if (!storedToken) {
       router.push("/sign-up");
+    } else {
+      setToken(storedToken);
     }
+
     let timer: NodeJS.Timeout;
     if (resendDisabled && countdown > 0) {
       timer = setInterval(() => {
@@ -45,15 +50,25 @@ export function VerifyForm({
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [resendDisabled, countdown, router, token]);
+  }, [resendDisabled, countdown, storedToken, router]);
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     setIsLoading(true);
 
+    if (!token) {
+      toast({
+        title: "Error",
+        description: "No token found. Please sign up again.",
+        variant: "destructive",
+      });
+      router.push("/sign-up");
+      return;
+    }
+
     const data = {
       otpValue,
-      token: token.value,
+      token,
     };
     try {
       const res = await fetch("/api/auth/verify", {
@@ -86,11 +101,10 @@ export function VerifyForm({
   }
 
   async function resendOTpHandler() {
-    if (resendDisabled) return;
+    if (resendDisabled || !token) return;
 
-    const token: any = getSessionData("token");
     const data = {
-      token: token.value,
+      token,
     };
     try {
       setResendDisabled(true);
