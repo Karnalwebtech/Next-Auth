@@ -41,8 +41,8 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       // if (result?.error) {
       //   throw new Error(result.error);
       // }
-
-      router.push("/");
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay
+      await router.replace("/");
     } catch (error) {
       console.log("asasas",error)
       toast({
@@ -53,6 +53,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       });
     } finally {
       setIsLoading(false);
+      
     }
   };
 
