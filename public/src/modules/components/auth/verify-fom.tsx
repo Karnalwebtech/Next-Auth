@@ -32,11 +32,9 @@ export function VerifyForm({
   const [countdown, setCountdown] = useState(59);
   const token: any = getSessionData("token");
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!token) {
-        router.push("/sign-up");
-      }
-    }, 2000);
+    if (!token) {
+      router.push("/sign-up");
+    }
     let timer: NodeJS.Timeout;
     if (resendDisabled && countdown > 0) {
       timer = setInterval(() => {
@@ -45,7 +43,6 @@ export function VerifyForm({
     }
 
     return () => {
-      clearTimeout(timeout);
       if (timer) clearInterval(timer);
     };
   }, [resendDisabled, countdown, router, token]);
